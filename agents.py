@@ -17,6 +17,7 @@ and represents one of the type of agents
 '''
 
 MESSAGE_ID = 0
+USER_ID = 0
 
 class Message:
 
@@ -50,6 +51,9 @@ class Message:
 	def add_influence():
 		self.influence += 1
 
+	def add_topic(topic):
+		self.topics.append(topic)
+
 
 '''
 This is the user class for our model and
@@ -57,9 +61,42 @@ represents one of the type of agents
 '''
 
 class User:
-	def __init__(self, name, age):
-		self.name = name
-		self.age = age
+	def __init__(self, belief, susceptibility, activity, topics):
+		global USER_ID
+
+		# This is the user id
+		self.id = USER_ID
+		USER_ID += 1
+
+		# This is the list of preferred topics for each user
+		self.topics = topics
+
+		# This is the amount of stubborness 
+		self.susceptibility = susceptibility
+
+		# This is the amount of influence/superspreadness for each user
+		self.superspreadness = 0 # We shall compute this later
+
+		# This is the amount of activity for each user (tweets, retweers)
+		self.activity = activity
+
+		# This is the belief for this user
+		self.belief = belief
+
+		# This is the list of followers
+		self.followers = []
+
+		# This is the list of following
+		self.following = []
+
+		# The following will be the attention mechanism
+
+		# This is the screen of the user
+		self.screen = []
+
+		# This is the memory of the user
+		self.memory = []
+
 
 '''
 This is a special kind of user agent 
@@ -68,7 +105,7 @@ spreadness
 '''
 
 class Bot(User):
-	pass
+	self.superspreadness = 0
 
 '''
 This is the most common user agent 
@@ -77,7 +114,7 @@ spreadness
 '''
 
 class Regular(User):
-	pass
+	self.superspreadness = 0
 
 '''
 This is a special kind of user agent 
@@ -86,7 +123,7 @@ spreadness
 '''
 
 class Verified(User):
-	pass
+	self.superspreadness = 0
 
 #p1 = Person("John", 36)
 
