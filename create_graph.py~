@@ -55,23 +55,19 @@ def get_top_follower_messages(agent):
 			follower_messages.append((message.time,message))
 
 	# Now let's sort by date and return top 10
-	tuple_messages = sorted(follower_messages, 
-			key=lambda x: x[1],reverse=True)[:10]
+	tuple_messages = sorted(follower_messages, key=lambda x: x[1],reverse=True)[:10]
 	return list(map(lambda (a,b): b, tuple_messages))
 
 # Let us first read the graph file in terms of nodes and edges
-nodes = map(lambda l: l.rstrip().split(","), 
-		open("nodes_er_close.ctl").readlines())
-edges = map(lambda l: l.rstrip().split(","), 
-		open("edges_er_close.ctl").readlines())
+nodes = map(lambda l: l.rstrip().split(","), open("nodes_er_close.ctl").readlines())
+edges = map(lambda l: l.rstrip().split(","), open("edges_er_far.ctl").readlines())
 
 def update_my_friends(agent):
 	my_followers = agent.followers
 	for follower in my_followers:
 		my_belief = agent.belief
 		follower_belief = follower.belief
-		if((my_belief > 0 and follower_belief < 0) or \
-				(my_belief < 0 and follower_belief > 0)):
+		if((my_belief > 0 and follower_belief < 0) or (my_belief < 0 and follower_belief > 0)):
 			if(abs(my_belief) - abs(follower_belief) < 0.5):
 				agent.delete_follower(follower)
 				follower.delete_follower(agent)
@@ -93,10 +89,7 @@ for node in nodes:
 	all_agents.append(ai)
 
 
-'''
-Now that we have initialized agents.. 
-let's add followers and following
-'''
+# Now that we have initialized agents.. let's add followers and following
 
 for edge in edges:
 	f = int(edge[0])
@@ -104,11 +97,7 @@ for edge in edges:
 	all_agents[f].followers.append(all_agents[t])
 	all_agents[t].followers.append(all_agents[f])
 
-'''
-Now that we have initialized connections.. 
-let's use FJ model to update beliefs
-'''
-
+# Now that we have initialized connections.. let's use FJ model to update beliefs
 probability_dist = []
 total_SS = 0
 
@@ -131,38 +120,26 @@ for agent in all_agents:
 	Wnorm = np.array(W)/total_SS
 	Yt_1 = np.array(Yt_1)
 
-	agent.belief = 0.5 * agent.belief + \
-		0.5 * (np.dot(Wnorm, Yt_1))
+	agent.belief = 0.5 * agent.belief + 0.5 * (np.dot(Wnorm, Yt_1))
 
-	agent.activity = agent.superspreadness * \
-		1.0/total_SS
+	agent.activity = agent.superspreadness * 1.0/total_SS
 
 	probability_dist.append(agent.activity)
 
 
-'''
-Now based on the activity of each agent, 
-we randomly pick an agent
-'''
-
+# Now based on the activity of each agent, we randomly pick an agent
 for i in range(10000):
-	agent_index = np.random.choice(np.arange(0, 50), 
-			p=probability_dist)
+	agent_index = np.random.choice(np.arange(0, 50), p=probability_dist)
 	curr_agent = all_agents[agent_index]
 	mi = agents.Message(curr_agent,[])
 	all_messages.append(mi)
 
 
 
-'''
-Let us first initialize messages based on 
-each users activity 
-'''
-
+# Let us first initialize messages based on each users activity 
 for i in range(1000):
 	# Choosing a random agent
-	agent_index = np.random.choice(np.arange(0, 50), 
-			p=probability_dist)
+	agent_index = np.random.choice(np.arange(0, 50), p=probability_dist)
 	# Who is the chosen one?
 	curr_agent = all_agents[agent_index]
 
@@ -173,8 +150,7 @@ for i in range(1000):
 		# Let's look at messages of all followers
 		#print("Agent " + str(agent_index)+" viewing messages")
 		# Getting top 10 messages
-		top_follower_messages = get_top_follower_messages\
-			(curr_agent)
+		top_follower_messages = get_top_follower_messages(curr_agent)
 		# Getting bernoulli trial for tweet or retweet
 		tweet_or_retweet = random.randint(0,1)
 
@@ -197,18 +173,14 @@ for i in range(1000):
 
 			if(full_influence != 0):
 
-				message_prob_dist = np.array\
-					(message_prob_dist)/full_influence
+				message_prob_dist = np.array(message_prob_dist)/full_influence
 				#print(message_prob_dist)
-				message_index = np.random.choice\
-					(np.arange(0, len(message_prob_dist)), p=message_prob_dist)
+				message_index = np.random.choice(np.arange(0, len(message_prob_dist)), p=message_prob_dist)
 				# Now we need to update beliefs.
-				curr_agent.belief = 0.5 * curr_agent.belief + \
-					0.4 * top_follower_messages[message_index].messenger.belief \
-						+ 0.1 * top_follower_messages[message_index].influence
-				top_follower_messages[message_index].add_influence\
-					(curr_agent.superspreadness)
+				curr_agent.belief = 0.5 * curr_agent.belief + 0.4 * top_follower_messages[message_index].messenger.belief + 0.1 * top_follower_messages[message_index].influence
+				top_follower_messages[message_index].add_influence(curr_agent.superspreadness)
 				# Now we need to update friends
+
 
 				# Let us update friends if the difference in beliefs is greater than 2
 				update_my_friends(curr_agent)

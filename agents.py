@@ -17,7 +17,8 @@ and represents one of the type of agents
 '''
 
 MESSAGE_ID = 0
-USER_ID = 0
+OVERALL_ACTIVITY = 0
+import time
 
 class Message:
 
@@ -35,7 +36,7 @@ class Message:
 	    and changes as people retweet it or 
 	    like it
 	    '''
-		self.influence = 0
+		self.influence = 0.8 * messenger.superspreadness
 		'''
 	    These are all topics related to the
 	    message. For now they are not weighted
@@ -44,12 +45,15 @@ class Message:
 	    '''
 		self.topics = topics
 
+		# Time stamp
+		self.time = time.time()
+
 	'''
 	This function is called on each retweet or like
 	'''
 
-	def add_influence():
-		self.influence += 1
+	def add_influence(self,influence=1):
+		self.influence += 0.8 * self.influence + 0.2 * influence
 
 	def add_topic(topic):
 		self.topics.append(topic)
@@ -61,21 +65,19 @@ represents one of the type of agents
 '''
 
 class User:
-	def __init__(self, belief, susceptibility, activity, topics):
-		global USER_ID
+	def __init__(self, id, belief, superspreadness, activity, topics):
 
 		# This is the user id
-		self.id = USER_ID
-		USER_ID += 1
+		self.id = id
 
 		# This is the list of preferred topics for each user
 		self.topics = topics
 
 		# This is the amount of stubborness 
-		self.susceptibility = susceptibility
+		#self.susceptibility = susceptibility
 
 		# This is the amount of influence/superspreadness for each user
-		self.superspreadness = 0 # We shall compute this later
+		self.superspreadness = superspreadness # We shall compute this later
 
 		# This is the amount of activity for each user (tweets, retweers)
 		self.activity = activity
@@ -89,13 +91,36 @@ class User:
 		# This is the list of following
 		self.following = []
 
+		self.messages = []
 		# The following will be the attention mechanism
 
 		# This is the screen of the user
-		self.screen = []
+		#self.screen = []
 
 		# This is the memory of the user
-		self.memory = []
+		#self.memory = []
+
+	def add_topic(topic):
+		self.topics.append(topic)
+
+	def increase_activity():
+		self.activity += 1
+		global OVERALL_ACTIVITY
+		OVERALL_ACTIVITY += 1
+
+	def add_follower(self,follower):
+		self.followers.append(follower)
+
+	def delete_follower(self,follower):
+		self.followers.remove(follower)
+
+	def add_following(self,following):
+		self.following.append(following)
+
+	def delete_following(self,following):
+		self.following.remove(following)
+
+
 
 
 '''
@@ -104,8 +129,8 @@ and has different level of super-
 spreadness
 '''
 
-class Bot(User):
-	self.superspreadness = 0
+#class Bot(User):
+#	self.superspreadness = 0
 
 '''
 This is the most common user agent 
@@ -113,8 +138,8 @@ and has different level of super-
 spreadness
 '''
 
-class Regular(User):
-	self.superspreadness = 0
+#class Regular(User):
+#	self.superspreadness = 0
 
 '''
 This is a special kind of user agent 
@@ -122,8 +147,8 @@ and has different level of super-
 spreadness
 '''
 
-class Verified(User):
-	self.superspreadness = 0
+#class Verified(User):
+#	self.superspreadness = 0
 
 #p1 = Person("John", 36)
 
